@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>治愈线条画室 · 优化版</title>
+    <style>
+        /* 基础样式 - 保持不变 */
+        body {
+            margin:0;
+            font-family:"Helvetica Neue", sans-serif;
+            background:url('https://www.transparenttextures.com/patterns/handmade-paper.png');
+            background-color:#f5f1e8;
+            color:#222;
+        }
+
+        /* 页面 */
+        .page{
+            min-height:100vh;
+            padding:60px 20px;
+            text-align:center;
+            box-sizing: border-box;
+        }
+
+        /* ---------- 第一页 左右布局 ---------- */
+        .cover-container {
+            display: flex;
+            max-width: 1000px;
+            margin: 0 auto;
+            align-items: center;
+            gap: 40px;
+            text-align: left;
+        }
+        .cover-left {
+            flex: 1.2;
+        }
+        .cover-left h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            color: #3a3a3a;
+        }
+        .featured-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background-color: #d9d0c0;
+            background-image: url('https://picsum.photos/id/1043/600/450'); /* 示例图，请替换为你的代表作 */
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.2);
+        }
+        .cover-right {
+            flex: 0.8;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(4px);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .cover-right h2 {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 10px;
+        }
+        .cover-right p {
+            line-height: 1.8;
+            color: #3a3a3a;
+            margin-bottom: 20px;
+        }
+        .cover-right .signature {
+            font-style: italic;
+            color: #7a6a5a;
+            text-align: right;
+        }
+
+        /* ---------- 第二页 作品集 ---------- */
+        .tabs {
+            margin: 30px 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .tabs button {
+            padding: 10px 20px;
+            border: none;
+            background: #e0d9ce;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            color: #2c2c2c;
+            font-weight: 500;
+        }
+        .tabs button:hover {
+            background: #b3a187;
+            color: white;
+        }
+
+        /* 自动排版 Masonry (与之前相同) */
+        .gallery {
+            column-count: 3;
+            column-gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .gallery img {
+            width: 100%;
+            margin-bottom: 20px;
+            filter: grayscale(100%);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: filter 0.3s, transform 0.2s;
+            background-color: #e8e1d5; /* 占位底色 */
+        }
+        .gallery img:hover {
+            filter: grayscale(30%);
+            transform: scale(1.02);
+        }
+
+        /* ---------- 第三页 联系方式 ---------- */
+        .contact {
+            background: #ffffffcc;
+            padding: 40px;
+            max-width: 500px;
+            margin: 40px auto;
+            border-radius: 32px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .contact p {
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+        .contact p:first-child {
+            margin-top: 0;
+        }
+        .contact .email, .contact .wechat {
+            font-weight: 600;
+            color: #5e4b3a;
+        }
+
+        /* 放大浏览模态框 (保持不变) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.5);
+        }
+
+        /* 响应式 */
+        @media (max-width: 700px) {
+            .cover-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .cover-left, .cover-right {
+                width: 100%;
+            }
+            .gallery {
+                column-count: 2;
+            }
+        }
+        @media (max-width: 450px) {
+            .gallery {
+                column-count: 1;
+            }
+        }
+
+        /* 占位说明（可删除） */
+        .note {
+            color: #a29b8c;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== 第一页：封面（代表作+简介） ========== -->
+<section class="page">
+    <div class="cover-container">
+        <!-- 左侧：一句话 + 代表作 -->
+        <div class="cover-left">
+            <h1>用线条治愈每一个日常</h1>
+            <!-- 代表作图片：将背景图片替换为你自己的图片路径 -->
+            <div class="featured-image" style="background-image: url('images/代表作1.jpg');">
+                <!-- 如果使用img标签，也可以改为：<img src="images/代表作.jpg" alt="代表作"> 但需要调整样式 -->
+            </div>
+            <!-- 提示：上面的style中的url请替换为你的图片路径，例如 'images/mybest.jpg' -->
+        </div>
+
+        <!-- 右侧：个人简介 -->
+        <div class="cover-right">
+            <h2>橘子猫</h2>
+            <p>橘子猫，独立插画师，人生实验记录者，出生于福州，是陪伴三个孩子成长的全职妈妈。作品以黑白简笔画为主要视觉语言，将生活的细碎光影、旅途的偶然相遇与日常感受收拢于画笔之下。</p>
+
+            <p>创作主题关注成长、陪伴与自由生长，作品常见于社区记录、城市漫游、诗集插画及文创延展。我相信艺术并不遥远，而藏在日常生活的烟火之中。</p>
+
+            <p>绘画既是心流的冥想，也是与世界温柔对话的方式。愿自己的画面能唤醒每个人心中持续好奇、向往自由的“漫游者”。</p>
+
+            <p>我相信插画是情绪的翻译机，希望我的画能让你感到片刻放松。</p>
+            <div class="signature">—— 橘子猫 · 2026</div>
+        </div>
+    </div>
+    <!-- 给个提示，便于替换图片（可自行删除） -->
+</section>
+
+<!-- ========== 第二页：作品集（六分类） ========== -->
+<section class="page">
+    <h2 style="font-weight:300; font-size:2.5rem; margin-top:0;">作品集</h2>
+
+    <!-- 分类标签 - 更新为六类 -->
+    <div class="tabs">
+        <button onclick="showCategory('emotion')">简笔画</button>
+        <button onclick="showCategory('daily')">手绘日记</button>
+        <button onclick="showCategory('dream')">漫游地图</button>
+        <button onclick="showCategory('oil')">油画</button>
+        <button onclick="showCategory('watercolor')">水彩</button>
+        <button onclick="showCategory('exhibition')">画展</button>
+    </div>
+
+    <!-- 六个画廊容器，每个容器内预置了示例图片占位 -->
+    <!-- 简笔画 -->
+    <div class="gallery" id="emotion">
+        <!-- 以下为示例图片，请替换为你自己的图片 -->
+        <img src=" images/简笔画1.jpg" alt="简笔画示例1" onclick="openModal(this)">
+        <img src=" images/简笔画2.jpg" alt="简笔画示例2" onclick="openModal(this)">
+        <img src=" images/简笔画3.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画4.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画5.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画6.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画7.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画8.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画9.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画10.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画11.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画12.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画13.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <img src=" images/简笔画14.jpg" alt="简笔画示例3" onclick="openModal(this)">
+        <!-- 你可以继续增加或删除图片，只需保证每个img都有 onclick="openModal(this)" 属性 -->
+    </div>
+    <!-- 手绘日记 -->
+    <div class="gallery" id="daily" style="display:none">
+        <img src=" images/手绘日记1.jpeg" alt="手绘日记1" onclick="openModal(this)">
+        <img src=" images/手绘日记2.jpeg" alt="手绘日记2" onclick="openModal(this)">
+        <img src=" images/手绘日记3.jpeg" alt="手绘日记3" onclick="openModal(this)">
+        <img src=" images/手绘日记4.jpeg" alt="手绘日记3" onclick="openModal(this)">
+        <img src=" images/手绘日记5.jpg" alt="手绘日记3" onclick="openModal(this)">
+        <img src=" images/手绘日记6.jpeg" alt="手绘日记3" onclick="openModal(this)">
+        <img src=" images/手绘日记7.jpg" alt="手绘日记3" onclick="openModal(this)">
+        <img src=" images/手绘日记8.jpg" alt="手绘日记3" onclick="openModal(this)">
+    </div>
+    <!-- 漫游地图 -->
+    <div class="gallery" id="dream" style="display:none">
+        <img src=" images/漫游地图1.jpeg" alt="漫游地图1" onclick="openModal(this)">
+        <img src=" images/漫游地图2.jpeg" alt="漫游地图2" onclick="openModal(this)">
+        <img src=" images/漫游地图3.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图4.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图5.jpg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图6.jpg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图7.jpg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图8.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图9.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图10.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图11.jpeg" alt="漫游地图3" onclick="openModal(this)">
+        <img src=" images/漫游地图12.jpeg" alt="漫游地图3" onclick="openModal(this)">
+    </div>
+    <!-- 油画 -->
+    <div class="gallery" id="oil" style="display:none">
+        <img src=" images/油画1.jpeg" alt="油画1" onclick="openModal(this)">
+        <img src=" images/油画2.jpeg" alt="油画2" onclick="openModal(this)">
+        <img src=" images/油画3.jpeg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画4.jpeg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画5.jpeg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画6.jpeg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画7.jpeg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画8.jpg" alt="油画3" onclick="openModal(this)">
+        <img src=" images/油画9.jpg" alt="油画3" onclick="openModal(this)">
+    </div>
+    <!-- 水彩 -->
+    <div class="gallery" id="watercolor" style="display:none">
+        <img src=" images/水彩1.jpeg" alt="水彩1" onclick="openModal(this)">
+        <img src=" images/水彩2.jpeg" alt="水彩2" onclick="openModal(this)">
+        <img src=" images/水彩3.jpeg" alt="水彩3" onclick="openModal(this)">
+        <img src=" images/水彩4.jpeg" alt="水彩2" onclick="openModal(this)">
+        <img src=" images/水彩5.jpeg" alt="水彩3" onclick="openModal(this)">
+    </div>
+    <!-- 画展 -->
+    <div class="gallery" id="exhibition" style="display:none">
+        <img src=" images/画展1.jpeg" alt="画展1" onclick="openModal(this)">
+        <img src="images/画展2.jpeg" alt="画展2" onclick="openModal(this)">
+        <img src="images/画展3.jpg" alt="画展3" onclick="openModal(this)">
+        <img src=" images/画展4.jpg" alt="画展1" onclick="openModal(this)">
+        <img src="images/画展5.jpg" alt="画展2" onclick="openModal(this)">
+        <img src="images/画展6.jpeg" alt="画展3" onclick="openModal(this)">
+        <img src=" images/画展7.jpeg" alt="画展1" onclick="openModal(this)">
+        <img src="images/画展8.jpeg" alt="画展2" onclick="openModal(this)">
+        <img src="images/画展9.jpeg" alt="画展3" onclick="openModal(this)">
+    </div>
+
+    <!-- 作品替换提示 -->
+   </section>
+
+<!-- ========== 第三页：联系方式（无上传） ========== -->
+<section class="page">
+    <h2 style="font-weight:300; font-size:2.5rem; margin-top:0;">联系我</h2>
+    <div class="contact">
+        <p>📧 邮箱：<span class="email">379728765@qq.com</span></p>
+        <p>💬 微信：<span class="wechat">caolang1210</span></p>
+        <p>🎨 合作 / 授权 欢迎联系</p>
+    </div>
+</section>
+
+<!-- 放大浏览模态框 -->
+<div class="modal" id="modal" onclick="closeModal()">
+    <img id="modalImg">
+</div>
+
+<script>
+    // 分类切换函数 (支持六个分类)
+    function showCategory(cat){
+        // 所有画廊ID列表
+        const categories = ['emotion','daily','dream','oil','watercolor','exhibition'];
+        categories.forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
+        document.getElementById(cat).style.display = 'block';
+    }
+
+    // 打开大图
+    function openModal(imgElement) {
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('modalImg').src = imgElement.src;
+    }
+
+    // 关闭大图
+    function closeModal(){
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    // 可选：默认显示第一个分类（简笔画）
+    window.onload = function() {
+        showCategory('emotion');
+    };
+</script>
+
+<!-- 已完全移除上传功能代码，所有上传相关监听器、元素均已删除 -->
+</body>
+</html>
